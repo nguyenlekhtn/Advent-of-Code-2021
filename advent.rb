@@ -1,5 +1,5 @@
-raise 'No file' unless File.exists?("input")
-path = 'example'
+path = 'input'
+raise 'No file' unless File.exists?(path)
 
 file = File.open(path)
 file_data = file.readlines.map(&:chomp)
@@ -9,22 +9,22 @@ formalized = file_data.map do |string|
   string.split(' -> ').map{ |location| location.split(',').map(&:to_i) }
 end
 
-p x_max = formalized.map { |start, goal| [start[0], goal[0]] }.flatten.max
-p y_max = formalized.map { |start, goal| [start[1], goal[1]] }.flatten.max
+x_max = formalized.map { |start, goal| [start[0], goal[0]] }.flatten.max
+y_max = formalized.map { |start, goal| [start[1], goal[1]] }.flatten.max
 
 def line_to_array(line)
   line => [[x0, y0], [x1, y1]]
   if x0 == x1
-    vertical_line_to_array(line)
+    vertical_line_to_array(*line)
   elsif y0 == y1
-    horizontal_line_to_array(line)
-
+    horizontal_line_to_array(*line)
+  end
 end
 
 def reversable_range(start, goal)
   return [] if start == goal
 
-  start < goal ? (start + 1).upto(goal - 1) : (start - 1).downto(goal + 1)
+  start < goal ? (start).upto(goal) : (start).downto(goal)
 end
 
 def vertical_line_to_array(start, goal)
@@ -47,17 +47,22 @@ end
 #   x_range.zip(y_range)
 # end
 
-init_arr = Array.new(x_max) { Array.new(y_max) {0} }
+init_arr = Array.new(x_max + 1) { Array.new(y_max + 1) {0} }
 vent = formalized.each_with_object(init_arr) do |line, arr|
-  return unless line_to_array(line)
-  line_to_array(line).each do |line_arr|
-    x, y = line_arr
-    arr[x][y] += 1
+  line_arr = line_to_array(line)
+  if line_arr
+    line_arr.each do |line_arr|
+      x, y = line_arr
+      arr[x][y] += 1
+    end
   end
 end
-vent.transpose.each do |line|
-  puts line
-end
+# vent.transpose.each do |line|
+#   p line
+# end
+
+p vent.flatten.count { |num| num >= 2}  
+
 
 
 
