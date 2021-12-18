@@ -1,9 +1,8 @@
 path = 'advent7/input.txt'
 raise "No find #{path}" unless File.exist?(path)
 
-file = File.open(path)
-file_data = file.read
-file.close
+file = File.new(path, chomp: true)
+file.readlines.map(&:to_i)
 
 data = file_data.split(',').map(&:to_i)
 
