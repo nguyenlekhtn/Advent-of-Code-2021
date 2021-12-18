@@ -7,7 +7,7 @@ class Model
 
   def initialize(path)
     @path = path
-    @open_arr = ['(', '[', '{','<']
+    @open_arr = ['(', '[', '{', '<']
     @close_arr = [')', ']',  '}', '>']
   end
 
@@ -17,6 +17,20 @@ class Model
 
   def display_part2_score
     puts "Part 2 score: #{completion_score_from_data(data)}"
+  end
+
+  private
+
+  def total_error_score
+    data.map { |line| get_illegal_char(line) }.compact.map { |char| error_score(char) }.sum
+  end
+
+  def completion_score_from_data(lines)
+    # require 'pry-byebug'; binding.pry
+    incomplete_open_arr = lines.map { |line| remove_all_pair(line) }.compact
+    incomplete_close_arr = incomplete_open_arr.map { |element| incomplete_open_to_close(element) }
+    sorted_score_arr = incomplete_close_arr.map { |element| arr_to_completion_score(element) }.sort
+    sorted_score_arr[sorted_score_arr.length / 2]
   end
 
   def pair?(open, close)
@@ -53,10 +67,6 @@ class Model
     }[char]
   end
 
-  def total_error_score
-    data.map { |line| get_illegal_char(line) }.compact.map { |char| error_score(char) }.sum
-  end
-
   def completion_score(char)
     {
       ')' => 1,
@@ -88,14 +98,6 @@ class Model
 
   def incomplete_open_to_close(incomplete_opens)
     incomplete_opens.reverse.map { |char| open_to_close(char) }
-  end
-
-  def completion_score_from_data(lines)
-    # require 'pry-byebug'; binding.pry
-    incomplete_open_arr = lines.map { |line| remove_all_pair(line) }.compact
-    incomplete_close_arr = incomplete_open_arr.map { |element| incomplete_open_to_close(element) }
-    sorted_score_arr = incomplete_close_arr.map { |element| arr_to_completion_score(element) }.sort
-    sorted_score_arr[sorted_score_arr.length / 2]
   end
 end
 
